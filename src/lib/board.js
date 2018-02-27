@@ -20,28 +20,28 @@ class Piece {
 }
 
 const PIECES = {
-  pawn: function() {
+  pawn: function () {
     return new Piece('pawn', 1);
   },
-  knight: function() {
+  knight: function () {
     return new Piece('knight', 3);
   },
-  bishop: function() {
+  bishop: function () {
     return new Piece('bishop', 3);
   },
-  rook: function() {
+  rook: function () {
     return new Piece('rook', 5);
   },
-  queen: function() {
+  queen: function () {
     return new Piece('queen', 9);
   },
-  king: function() {
+  king: function () {
     return new Piece('king', -1);
   },
 };
 
 const DEFAULT_SETUP = [
-  [PIECES.pawn, PIECES.pawn,   PIECES.pawn,   PIECES.pawn,  PIECES.pawn, PIECES.pawn,   PIECES.pawn,   PIECES.pawn],
+  [PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn],
   [PIECES.rook, PIECES.knight, PIECES.bishop, PIECES.queen, PIECES.king, PIECES.bishop, PIECES.knight, PIECES.rook]
 ]
 
