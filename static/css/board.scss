@@ -1,0 +1,66 @@
+$white-square: #F5DEB3;
+$black-square: #8B4513;
+$white-piece: #D2B48C;
+$black-piece: black;
+
+.board {
+  display: flex;
+  flex-direction: column;
+  width: 24rem;
+  height: 24rem;
+  .row {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    .space {
+      flex: 1;
+      text-align: center;
+      line-height: 3rem;
+      font-size: 2rem;
+      .piece {
+        &.black {
+          color: $black-piece;
+        }
+        &.white {
+          color: $white-piece;
+          -webkit-text-stroke: 1px black;
+          text-stroke: 1px black;
+        }
+        &.pawn::after {
+          content: '♟';
+        }
+        &.knight::after {
+          content: '♞';
+        }
+        &.bishop::after {
+          content: '♝';
+        }
+        &.rook::after {
+          content: '♜';
+        }
+        &.queen::after {
+          content: '♛';
+        }
+        &.king::after {
+          content: '♚';
+        }
+      }
+    }
+    &:nth-child(even) {
+      .space:nth-child(even) {
+        background-color: $white-square;
+      }
+      .space:nth-child(odd) {
+        background-color: $black-square;
+      }
+    }
+    &:nth-child(odd) {
+      .space:nth-child(even) {
+        background-color: $black-square;
+      }
+      .space:nth-child(odd) {
+        background-color: $white-square;
+      }
+    }
+  }
+}
