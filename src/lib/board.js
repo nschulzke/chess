@@ -1,7 +1,9 @@
 class Piece {
-  constructor(name, value) {
+  constructor(name, value, moves) {
     this.name = name;
     this.value = value;
+    this.moves = moves;
+    this.hasMoved = false;
   }
 
   white() {
@@ -21,55 +23,117 @@ class Piece {
 
 const PIECES = {
   pawn: function () {
-    return new Piece('pawn', 1);
+    return new Piece('pawn', 1, [
+      {
+        type: 'diagonal',
+        range: 1,
+        move: false,
+        back: false
+      },
+      {
+        type: 'straight',
+        range: 1,
+        capture: false,
+        back: false
+      },
+      {
+        type: 'straight',
+        range: 2,
+        capture: false,
+        hasMoved: false,
+        back: false
+      }
+    ]);
   },
   knight: function () {
-    return new Piece('knight', 3);
+    return new Piece('knight', 3, [
+      {
+        type: 'knight',
+        range: [1, 2]
+      }
+    ]);
   },
   bishop: function () {
-    return new Piece('bishop', 3);
+    return new Piece('bishop', 3, [
+      {
+        type: 'diagonal',
+        range: -1
+      }
+    ]);
   },
   rook: function () {
-    return new Piece('rook', 5);
+    return new Piece('rook', 5, [
+      {
+        type: 'straight',
+        range: -1
+      }
+    ]);
   },
   queen: function () {
-    return new Piece('queen', 9);
+    return new Piece('queen', 9, [
+      {
+        type: 'straight',
+        range: -1
+      },
+      {
+        type: 'diagonal',
+        range: -1
+      }
+    ]);
   },
   king: function () {
-    return new Piece('king', -1);
+    return new Piece('king', -1, [
+      {
+        type: 'straight',
+        range: 1
+      },
+      {
+        type: 'diagonal',
+        range: 1
+      }
+    ]);
   },
 };
 
 const DEFAULT_SETUP = [
   [PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn],
   [PIECES.rook, PIECES.knight, PIECES.bishop, PIECES.queen, PIECES.king, PIECES.bishop, PIECES.knight, PIECES.rook]
-]
+];
 
-var DEFAULT_BOARD = [];
-for (var i = 0; i < 8; i++) {
+let DEFAULT_BOARD = [];
+for (let i = 0; i < 8; i++) {
   DEFAULT_BOARD[i] = [];
 }
-for (var i = 0; i < 8; i++) {
-  DEFAULT_BOARD[0][i] = DEFAULT_SETUP[1][i]().black();
-  DEFAULT_BOARD[1][i] = DEFAULT_SETUP[0][i]().black();
-  DEFAULT_BOARD[6][i] = DEFAULT_SETUP[0][i]().white();
-  DEFAULT_BOARD[7][i] = DEFAULT_SETUP[1][i]().white();
+for (let j = 0; j < 8; j++) {
+  DEFAULT_BOARD[0][j] = DEFAULT_SETUP[1][j]().black();
+  DEFAULT_BOARD[1][j] = DEFAULT_SETUP[0][j]().black();
+  DEFAULT_BOARD[6][j] = DEFAULT_SETUP[0][j]().white();
+  DEFAULT_BOARD[7][j] = DEFAULT_SETUP[1][j]().white();
 }
 Object.freeze(DEFAULT_BOARD);
 
 export default class Board {
   constructor() {
     this.board = [];
-    for (var i = 0; i < 8; i++) {
+    this.blackCaptured = [];
+    this.whiteCaptured = [];
+    for (let i = 0; i < 8; i++) {
       this.board.push([]);
-      for (var j = 0; j < 8; j++) {
+      for (let j = 0; j < 8; j++) {
         this.board[i].push(DEFAULT_BOARD[i][j]);
       }
     }
   }
 
   movePiece(start, dest) {
-    if (this.board[dest.row][dest.col] === undefined) {
+    if (this.canCapture(this.board[start.row][start.col], dest.row, dest.col) !== false) {
+      if (this.board[dest.row][dest.col] !== undefined) {
+        if (this.board[dest.row][dest.col].color === 'white')
+          this.whiteCaptured.push(this.board[dest.row][dest.col]);
+        else
+          this.blackCaptured.push(this.board[dest.row][dest.col]);
+      }
+      this.board[start.row][start.col].hasMoved = true;
       this.board[dest.row].splice(dest.col, 1, this.board[start.row][start.col]);
       this.board[start.row].splice(start.col, 1, undefined);
     }
@@ -77,5 +141,124 @@ export default class Board {
 
   getPiece(row, col) {
     return this.board[row][col];
+  }
+
+  canCapture(piece, row, col) {
+    if (this.getPiece(row, col) === undefined)
+      return undefined;
+    return this.getPiece(row, col).color !== piece.color;
+  }
+
+  validMoves(row, col) {
+    let movePush = (array, moveRow, moveCol) => {
+      return array.push({
+        row: row + moveRow,
+        col: col + moveCol
+      });
+    };
+
+    let contPush = (array, row, col) => {
+      if (row < 0 || col < 0 || row > 7 || col > 7)
+        return false;
+      if (this.canCapture(piece, row, col) !== false)
+        array.push({row: row, col: col});
+      else return false;
+      return this.getPiece(row, col) === undefined;
+    };
+
+    let piece = this.getPiece(row, col);
+    let moves = piece.moves;
+    let ret = [];
+    moves.forEach((move) => {
+      if (move.hasMoved === false && piece.hasMoved === true)
+        return;
+
+      let all = [];
+      if (move.type === 'diagonal') {
+        if (move.range === -1) {
+          for (let r = row - 1, c = col - 1; r >= 0, c >= 0; r--, c--) {
+            if (!contPush(all, r, c)) break;
+          }
+          for (let r = row + 1, c = col - 1; r <= 7, c >= 0; r++, c--) {
+            if (!contPush(all, r, c)) break;
+          }
+          for (let r = row + 1, c = col + 1; r <= 7, c <= 7; r++, c++) {
+            if (!contPush(all, r, c)) break;
+          }
+          for (let r = row - 1, c = col + 1; r >= 0, c <= 7; r--, c++) {
+            if (!contPush(all, r, c)) break;
+          }
+        } else {
+          if (move.back === false) {
+            if (piece.color === 'black') {
+              movePush(all, move.range, move.range);
+              movePush(all, move.range, -move.range);
+            } else if (piece.color === 'white') {
+              movePush(all, -move.range, move.range);
+              movePush(all, -move.range, -move.range);
+            }
+          } else {
+            movePush(all, move.range, move.range);
+            movePush(all, -move.range, move.range);
+            movePush(all, move.range, -move.range);
+            movePush(all, -move.range, -move.range);
+          }
+        }
+      } else if (move.type === 'straight') {
+        if (move.range === -1) {
+          for (let r = row - 1; r >= 0; r--) {
+            if (!contPush(all, r, col)) break;
+          }
+          for (let r = row + 1; r <= 7; r++) {
+            if (!contPush(all, r, col)) break;
+          }
+          for (let c = col - 1; c >= 0; c--) {
+            if (!contPush(all, row, c)) break;
+          }
+          for (let c = col + 1; c <= 7; c++) {
+            if (!contPush(all, row, c)) break;
+          }
+        } else {
+          if (move.back === false) {
+            if (piece.color === 'black') {
+              movePush(all, move.range, 0);
+            } else if (piece.color === 'white') {
+              movePush(all, -move.range, 0);
+            }
+          } else {
+            movePush(all, move.range, 0);
+            movePush(all, 0, move.range);
+            movePush(all, 0, -move.range);
+            movePush(all, -move.range, 0);
+          }
+        }
+      } else if (move.type === 'knight') {
+        movePush(all, move.range[0], move.range[1]);
+        movePush(all, -move.range[0], move.range[1]);
+        movePush(all, -move.range[0], -move.range[1]);
+        movePush(all, move.range[0], -move.range[1]);
+        movePush(all, move.range[1], move.range[0]);
+        movePush(all, -move.range[1], move.range[0]);
+        movePush(all, -move.range[1], -move.range[0]);
+        movePush(all, move.range[1], -move.range[0]);
+      }
+      all = all.filter((m) => {
+        if (m.row < 0 || m.col < 0)
+          return false;
+        if (m.row > 7 || m.col > 7)
+          return false;
+        if (move.capture === false && this.canCapture(piece, m.row, m.col) === true)
+          return false;
+        if (move.move === false && !this.canCapture(piece, m.row, m.col) === true)
+          return false;
+        if (this.canCapture(piece, m.row, m.col) === false)
+          return false;
+        return true;
+      });
+      ret = ret.concat(all);
+    });
+
+    console.log(ret);
+    return ret;
   }
 }
