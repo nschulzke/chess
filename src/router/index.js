@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Board from '@/components/Board'
+import Game from '@/components/Game'
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Board',
-      component: Board
+      name: 'Game',
+      component: Game
     }
   ]
 })
