@@ -1,99 +1,4 @@
-class Piece {
-  constructor(name, value, moves) {
-    this.name = name;
-    this.value = value;
-    this.moves = moves;
-    this.hasMoved = false;
-  }
-
-  white() {
-    this.color = 'white';
-    return this;
-  }
-
-  black() {
-    this.color = 'black';
-    return this;
-  }
-
-  class() {
-    return this.name + ' ' + this.color;
-  }
-}
-
-const PIECES = {
-  pawn: function () {
-    return new Piece('pawn', 1, [
-      {
-        type: 'diagonal',
-        range: 1,
-        move: false,
-        back: false
-      },
-      {
-        type: 'straight',
-        range: 1,
-        capture: false,
-        back: false
-      },
-      {
-        type: 'straight',
-        range: 2,
-        capture: false,
-        hasMoved: false,
-        back: false
-      }
-    ]);
-  },
-  knight: function () {
-    return new Piece('knight', 3, [
-      {
-        type: 'knight',
-        range: [1, 2]
-      }
-    ]);
-  },
-  bishop: function () {
-    return new Piece('bishop', 3, [
-      {
-        type: 'diagonal',
-        range: -1
-      }
-    ]);
-  },
-  rook: function () {
-    return new Piece('rook', 5, [
-      {
-        type: 'straight',
-        range: -1
-      }
-    ]);
-  },
-  queen: function () {
-    return new Piece('queen', 9, [
-      {
-        type: 'straight',
-        range: -1
-      },
-      {
-        type: 'diagonal',
-        range: -1
-      }
-    ]);
-  },
-  king: function () {
-    return new Piece('king', -1, [
-      {
-        type: 'straight',
-        range: 1
-      },
-      {
-        type: 'diagonal',
-        range: 1
-      }
-    ]);
-  },
-};
+import PIECES from './pieces.js'
 
 const DEFAULT_SETUP = [
   [PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn, PIECES.pawn],
@@ -117,6 +22,7 @@ export default class Board {
     this.board = [];
     this.blackCaptured = [];
     this.whiteCaptured = [];
+    this.promotionListener = (row, col) => {};
     for (let i = 0; i < 8; i++) {
       this.board.push([]);
       for (let j = 0; j < 8; j++) {
@@ -136,7 +42,23 @@ export default class Board {
       this.board[start.row][start.col].hasMoved = true;
       this.board[dest.row].splice(dest.col, 1, this.board[start.row][start.col]);
       this.board[start.row].splice(start.col, 1, undefined);
+      let piece = this.board[dest.row][dest.col];
+      if (piece.name === 'pawn') {
+        if (piece.color === 'white' && dest.row === 0)
+          this.promotionListener(dest.row, dest.col);
+        else if (piece.color === 'black' && dest.row === 7)
+          this.promotionListener(dest.row, dest.col);
+      }
     }
+  }
+
+  promote(row, col, piece) {
+    if (row !== 0 && row !== 7)
+      return false;
+    let original = this.board[row][col];
+    original.name = piece.name;
+    original.value = piece.value;
+    original.moves = piece.moves;
   }
 
   getPiece(row, col) {
