@@ -18,6 +18,13 @@
         <span class="piece" v-for="piece in board.blackCaptured" v-bind:class="piece.class()"></span>
       </div>
     </div>
+    <div class="promotion" v-if="promoteWindow">
+      <p>Promote to what?</p>
+      <span class="piece knight" v-bind:class="promoteColor" v-on:click="promote(pieces.knight())"></span>
+      <span class="piece bishop" v-bind:class="promoteColor" v-on:click="promote(pieces.bishop())"></span>
+      <span class="piece rook" v-bind:class="promoteColor" v-on:click="promote(pieces.rook())"></span>
+      <span class="piece queen" v-bind:class="promoteColor" v-on:click="promote(pieces.queen())"></span>
+    </div>
   </div>
 </template>
 
@@ -25,6 +32,7 @@
   const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
   import Board from "@/lib/board.js"
+  import PIECES from "@/lib/pieces.js"
 
   export default {
     name: 'Board',
@@ -33,7 +41,11 @@
         board: new Board(),
         highlight: [],
         selected: undefined,
-        turn: 'white'
+        turn: 'white',
+        promoteWindow: false,
+        lastStart: {},
+        lastDest: {},
+        pieces: PIECES
       }
     },
     created: function () {
@@ -42,6 +54,7 @@
         for (let j = 0; j < 8; j++) {
           this.highlight[i].push(false);
         }
+        this.board.promotionListener = this.promotionListener;
       }
     },
     methods: {
@@ -77,8 +90,12 @@
         this.turn = this.turn === 'white' ? 'black' : 'white';
       },
       selectSquare: function (row, col) {
+        if (this.promoteWindow)
+          return false;
         if (this.isHighlighted(row, col)) {
           this.board.movePiece({row: this.selected.row, col: this.selected.col}, {row: row, col: col});
+          this.lastStart = {row: this.selected.row, col: this.selected.col};
+          this.lastDest = {row: row, col: col};
           this.resetHighlight();
           this.switchTurn();
         } else {
@@ -94,6 +111,14 @@
       isHighlighted: function (row, col) {
         return this.highlight[row][col];
       },
+      promotionListener: function () {
+        this.promoteWindow = true;
+        this.promoteColor = this.turn;
+      },
+      promote: function (piece) {
+        this.board.promote(this.lastDest.row, this.lastDest.col, piece);
+        this.promoteWindow = false;
+      }
     },
   }
 </script>
