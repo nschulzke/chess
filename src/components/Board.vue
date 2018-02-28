@@ -1,19 +1,22 @@
 <template>
   <div class="game">
     <div class="turn">{{turn}}'s turn</div>
-    <div class="prison">
-      <span class="piece" v-for="piece in board.whiteCaptured" v-bind:class="piece.class()"></span>
-    </div>
-    <div class="board" id="board">
-      <div class="row" v-for="(a, i) in 8">
-        <div class="space" v-bind:id="spaceId(i, j)" v-for="(b, j) in 8" v-bind:class="{highlight: isHighlighted(i, j)}"
-             v-on:click="selectSquare(i, j)">
-          <span class="piece" v-bind:class="getPiece(i, j)"></span>
+    <div class="table">
+      <div class="prison">
+        <span class="piece" v-for="piece in board.whiteCaptured" v-bind:class="piece.class()"></span>
+      </div>
+      <div class="board" id="board">
+        <div class="row" v-for="(a, i) in 8">
+          <div class="space" v-bind:id="spaceId(i, j)" v-for="(b, j) in 8"
+               v-bind:class="{highlight: isHighlighted(i, j)}"
+               v-on:click="selectSquare(i, j)">
+            <span class="piece" v-bind:class="getPiece(i, j)"></span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="prison">
-      <span class="piece" v-for="piece in board.blackCaptured" v-bind:class="piece.class()"></span>
+      <div class="prison">
+        <span class="piece" v-for="piece in board.blackCaptured" v-bind:class="piece.class()"></span>
+      </div>
     </div>
   </div>
 </template>
@@ -96,9 +99,19 @@
 </script>
 
 <style scoped>
+  .table {
+    width: 30rem;
+    background-color: #763B10;
+    margin: 0 auto;
+    border-radius: 2rem;
+  }
+
   .prison {
     height: 3rem;
+    width: 100%;
+    margin: 0 auto;
   }
+
   .board {
     margin: 0 auto;
   }

@@ -1,6 +1,7 @@
 @charset "UTF-8";
 .piece {
-  font-size: 1.75rem; }
+  font-size: 1.75rem;
+  font-family: ChessMedium, sans-serif; }
   .piece.black {
     color: black; }
   .piece.white {
@@ -24,7 +25,9 @@
   display: flex;
   flex-direction: column;
   width: 24rem;
-  height: 24rem; }
+  height: 24rem;
+  border: 0.8rem solid #5A2D0C;
+  border-radius: 3px; }
   .board .row {
     flex: 1;
     display: flex;

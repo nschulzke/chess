@@ -4,9 +4,11 @@ $black-square: #8B4513;
 $black-highlight: #A8340E;
 $white-piece: #D2B48C;
 $black-piece: black;
+$border-color: #5A2D0C;
 
 .piece {
   font-size: 1.75rem;
+  font-family: ChessMedium, sans-serif;
   &.black {
     color: $black-piece;
   }
@@ -40,6 +42,8 @@ $black-piece: black;
   flex-direction: column;
   width: 24rem;
   height: 24rem;
+  border: 0.8rem solid $border-color;
+  border-radius: 3px;
   .row {
     flex: 1;
     display: flex;
