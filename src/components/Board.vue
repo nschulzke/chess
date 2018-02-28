@@ -8,7 +8,7 @@
       <div class="board" id="board">
         <div class="row" v-for="(a, i) in 8">
           <div class="space" v-bind:id="spaceId(i, j)" v-for="(b, j) in 8"
-               v-bind:class="{highlight: isHighlighted(i, j)}"
+               v-bind:class="{highlight: isHighlighted(i, j), highlightGreen: isRecentMove(i, j)}"
                v-on:click="selectSquare(i, j)">
             <span class="piece" v-bind:class="getPiece(i, j)"></span>
           </div>
@@ -110,6 +110,16 @@
       },
       isHighlighted: function (row, col) {
         return this.highlight[row][col];
+      },
+      isRecentMove: function (row, col) {
+        if (this.lastDest.row === row && this.lastDest.col === col) {
+          console.log(row, col);
+          console.log(this.lastDest);
+          return true;
+        }
+        else if (this.lastStart.row === row && this.lastStart.col === col)
+          return true;
+        return false;
       },
       promotionListener: function () {
         this.promoteWindow = true;

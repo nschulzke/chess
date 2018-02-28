@@ -1,7 +1,9 @@
 $white-square: #F5DEB3;
 $white-highlight: #F8A686;
+$white-highlight-green: #DCE1A1;
 $black-square: #8B4513;
 $black-highlight: #A8340E;
+$black-highlight-green: #7D5811;
 $white-piece: #D2B48C;
 $black-piece: black;
 $border-color: #5A2D0C;
@@ -64,11 +66,17 @@ $border-color: #5A2D0C;
         &.highlight {
           background-color: $white-highlight;
         }
+        &.highlightGreen {
+          background-color: $white-highlight-green;
+        }
       }
       .space:nth-child(odd) {
         background-color: $black-square;
         &.highlight {
           background-color: $black-highlight;
+        }
+        &.highlightGreen {
+          background-color: $black-highlight-green;
         }
       }
     }
@@ -78,11 +86,17 @@ $border-color: #5A2D0C;
         &.highlight {
           background-color: $black-highlight;
         }
+        &.highlightGreen {
+          background-color: $black-highlight-green;
+        }
       }
       .space:nth-child(odd) {
         background-color: $white-square;
         &.highlight {
           background-color: $white-highlight;
+        }
+        &.highlightGreen {
+          background-color: $white-highlight-green;
         }
       }
     }
