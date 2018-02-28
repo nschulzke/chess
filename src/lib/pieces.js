@@ -42,6 +42,9 @@ const PIECES = {
         capture: false,
         hasMoved: false,
         back: false
+      },
+      {
+        type: 'passant'
       }
     ]);
   },
@@ -90,6 +93,9 @@ const PIECES = {
       {
         type: 'diagonal',
         range: 1
+      },
+      {
+        type: 'castle'
       }
     ]);
   },
