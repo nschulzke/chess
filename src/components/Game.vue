@@ -1,6 +1,5 @@
 <template>
   <div class="game">
-    <div class="turn">{{turn}}'s turn</div>
     <div class="table">
       <div class="prison">
         <span class="piece" v-for="piece in board.whiteCaptured" v-bind:class="piece.class()"></span>
@@ -24,6 +23,10 @@
       <span class="piece bishop" v-bind:class="promoteColor" v-on:click="promote(pieces.bishop())"></span>
       <span class="piece rook" v-bind:class="promoteColor" v-on:click="promote(pieces.rook())"></span>
       <span class="piece queen" v-bind:class="promoteColor" v-on:click="promote(pieces.queen())"></span>
+    </div>
+    <div class="controls">
+      <div class="turn">{{turnReadable}}'s turn</div>
+      <button v-bind:onclick="restart()">Restart</button>
     </div>
   </div>
 </template>
@@ -58,6 +61,9 @@
       }
     },
     methods: {
+      restart: function () {
+
+      },
       spaceId: function (row, col) {
         col = COLS[col];
         row = row + 1;
@@ -130,10 +136,36 @@
         this.promoteWindow = false;
       }
     },
+    computed: {
+      turnReadable: function () {
+        if (this.turn === 'white') return 'White';
+        if (this.turn === 'black') return 'Black';
+        return '';
+      }
+    }
   }
 </script>
 
 <style scoped>
+  .game {
+    width: 100%;
+  }
+
+  .controls {
+    box-sizing: border-box;
+    color: white;
+    text-align: center;
+    background-color: #763B10;
+    padding: 1rem;
+    border-radius: 1.5rem;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .controls > * {
+    margin-bottom: 1rem;
+  }
+
   .table {
     width: 30rem;
     background-color: #763B10;
@@ -149,5 +181,19 @@
 
   .board {
     margin: 0 auto;
+  }
+
+  @media only screen and (min-width: 720px) {
+    .game {
+      display: flex;
+      width: 40rem;
+      margin: 0 auto;
+    }
+
+    .controls {
+      flex: 1;
+      margin-top: 0;
+      margin-left: 1rem;
+    }
   }
 </style>
