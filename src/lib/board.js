@@ -22,7 +22,7 @@ export default class Board {
     this.board = [];
     this.blackCaptured = [];
     this.whiteCaptured = [];
-    this.promotionListener = (row, col) => {};
+    this.promotionListener = (coords) => {};
     for (let i = 0; i < 8; i++) {
       this.board.push([]);
       for (let j = 0; j < 8; j++) {
@@ -32,7 +32,7 @@ export default class Board {
   }
 
   movePiece(start, dest) {
-    if (this.canCapture(this.board[start.row][start.col], dest.row, dest.col) !== false) {
+    if (this.canCapture(this.board[start.row][start.col], dest) !== false) {
       if (this.board[dest.row][dest.col] !== undefined) {
         if (this.board[dest.row][dest.col].color === 'white')
           this.whiteCaptured.push(this.board[dest.row][dest.col]);
@@ -52,27 +52,31 @@ export default class Board {
     }
   }
 
-  promote(row, col, piece) {
-    if (row !== 0 && row !== 7)
+  promote(coords, piece) {
+    if (coords.row !== 0 && coords.row !== 7)
       return false;
-    let original = this.board[row][col];
+    let original = this.board[coords.row][coords.col];
     original.name = piece.name;
     original.value = piece.value;
     original.moves = piece.moves;
   }
 
-  getPiece(row, col) {
-    return this.board[row][col];
+  getPiece(coords) {
+    return this.board[coords.row][coords.col];
   }
 
-  canCapture(piece, row, col) {
-    if (this.getPiece(row, col) === undefined)
+  canCapture(piece, coords) {
+    if (this.getPiece(coords) === undefined)
       return undefined;
-    return this.getPiece(row, col).color !== piece.color;
+    return this.getPiece(coords).color !== piece.color;
   }
 
-  validMoves(row, col) {
+  validMoves(coords) {
+    let row = coords.row;
+    let col = coords.col;
     let movePush = (array, moveRow, moveCol) => {
+      let row = coords.row;
+      let col = coords.col;
       return array.push({
         row: row + moveRow,
         col: col + moveCol
@@ -80,15 +84,16 @@ export default class Board {
     };
 
     let contPush = (array, row, col) => {
+      coords = {row: row, col: col};
       if (row < 0 || col < 0 || row > 7 || col > 7)
         return false;
-      if (this.canCapture(piece, row, col) !== false)
-        array.push({row: row, col: col});
+      if (this.canCapture(piece, coords) !== false)
+        array.push(coords);
       else return false;
-      return this.getPiece(row, col) === undefined;
+      return this.getPiece(coords) === undefined;
     };
 
-    let piece = this.getPiece(row, col);
+    let piece = this.getPiece(coords);
     let moves = piece.moves;
     let ret = [];
     moves.forEach((move) => {
@@ -169,11 +174,11 @@ export default class Board {
           return false;
         if (m.row > 7 || m.col > 7)
           return false;
-        if (move.capture === false && this.canCapture(piece, m.row, m.col) === true)
+        if (move.capture === false && this.canCapture(piece, m) === true)
           return false;
-        if (move.move === false && !this.canCapture(piece, m.row, m.col) === true)
+        if (move.move === false && !this.canCapture(piece, m) === true)
           return false;
-        if (this.canCapture(piece, m.row, m.col) === false)
+        if (this.canCapture(piece, m) === false)
           return false;
         return true;
       });

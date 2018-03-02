@@ -3,7 +3,7 @@ $white-highlight: #F8A686;
 $white-highlight-green: #DCE1A1;
 $black-square: #8B4513;
 $black-highlight: #A8340E;
-$black-highlight-green: #7D5811;
+$black-highlight-green: #6F6A0F;
 $white-piece: #D2B48C;
 $black-piece: black;
 $border-color: #5A2D0C;
@@ -63,40 +63,40 @@ $border-color: #5A2D0C;
     &:nth-child(even) {
       .space:nth-child(even) {
         background-color: $white-square;
-        &.highlight {
-          background-color: $white-highlight;
-        }
         &.highlightGreen {
           background-color: $white-highlight-green;
+        }
+        &.highlight {
+          background-color: $white-highlight;
         }
       }
       .space:nth-child(odd) {
         background-color: $black-square;
-        &.highlight {
-          background-color: $black-highlight;
-        }
         &.highlightGreen {
           background-color: $black-highlight-green;
+        }
+        &.highlight {
+          background-color: $black-highlight;
         }
       }
     }
     &:nth-child(odd) {
       .space:nth-child(even) {
         background-color: $black-square;
-        &.highlight {
-          background-color: $black-highlight;
-        }
         &.highlightGreen {
           background-color: $black-highlight-green;
+        }
+        &.highlight {
+          background-color: $black-highlight;
         }
       }
       .space:nth-child(odd) {
         background-color: $white-square;
-        &.highlight {
-          background-color: $white-highlight;
-        }
         &.highlightGreen {
           background-color: $white-highlight-green;
+        }
+        &.highlight {
+          background-color: $white-highlight;
         }
       }
     }

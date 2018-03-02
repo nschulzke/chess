@@ -2,11 +2,11 @@
   <div class="game">
     <div class="table">
       <div class="prison">
-        <span class="piece" v-for="piece in board.whiteCaptured" v-bind:class="piece.class()"></span>
+        <span class="piece" v-for="piece in game.board.whiteCaptured" v-bind:class="piece.class()"></span>
       </div>
       <div class="board" id="board">
         <div class="row" v-for="(a, i) in 8">
-          <div class="space" v-bind:id="spaceId(i, j)" v-for="(b, j) in 8"
+          <div class="space" v-bind:id="toPos(i, j)" v-for="(b, j) in 8"
                v-bind:class="{highlight: isHighlighted(i, j), highlightGreen: isRecentMove(i, j)}"
                v-on:click="selectSquare(i, j)">
             <span class="piece" v-bind:class="getPiece(i, j)"></span>
@@ -14,19 +14,19 @@
         </div>
       </div>
       <div class="prison">
-        <span class="piece" v-for="piece in board.blackCaptured" v-bind:class="piece.class()"></span>
+        <span class="piece" v-for="piece in game.board.blackCaptured" v-bind:class="piece.class()"></span>
       </div>
-    </div>
-    <div class="promotion" v-if="promoteWindow">
-      <p>Promote to what?</p>
-      <span class="piece knight" v-bind:class="promoteColor" v-on:click="promote(pieces.knight())"></span>
-      <span class="piece bishop" v-bind:class="promoteColor" v-on:click="promote(pieces.bishop())"></span>
-      <span class="piece rook" v-bind:class="promoteColor" v-on:click="promote(pieces.rook())"></span>
-      <span class="piece queen" v-bind:class="promoteColor" v-on:click="promote(pieces.queen())"></span>
+      <div class="promotion" v-if="promoteWindow">
+        <p>Promote to what?</p>
+        <span class="piece knight" v-bind:class="promoteColor" v-on:click="promote(pieces.knight())"></span>
+        <span class="piece bishop" v-bind:class="promoteColor" v-on:click="promote(pieces.bishop())"></span>
+        <span class="piece rook" v-bind:class="promoteColor" v-on:click="promote(pieces.rook())"></span>
+        <span class="piece queen" v-bind:class="promoteColor" v-on:click="promote(pieces.queen())"></span>
+      </div>
     </div>
     <div class="controls">
       <div class="turn">{{turnReadable}}'s turn</div>
-      <button v-bind:onclick="restart()">Restart</button>
+      <button v-on:click="restart()">Restart</button>
     </div>
   </div>
 </template>
@@ -34,14 +34,14 @@
 <script>
   const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-  import Board from "@/lib/board.js"
+  import Game from "@/lib/game.js"
   import PIECES from "@/lib/pieces.js"
 
   export default {
     name: 'Board',
     data() {
       return {
-        board: new Board(),
+        game: new Game(),
         highlight: [],
         selected: undefined,
         turn: 'white',
@@ -57,27 +57,59 @@
         for (let j = 0; j < 8; j++) {
           this.highlight[i].push(false);
         }
-        this.board.promotionListener = this.promotionListener;
+        this.game.setPromotionListener(this.promotionListener);
       }
     },
     methods: {
       restart: function () {
-
+        this.game.restart();
       },
-      spaceId: function (row, col) {
-        col = COLS[col];
-        row = row + 1;
-        return col + row;
-      },
-      coords: function (string) {
-        col = COLS.findIndex((item) => item === string[0]);
-        row = Number(string[1]) - 1;
-        return {col: col, row: row};
+      toPos: function (row, col) {
+        return Game.toPos({row: row, col: col});
       },
       getPiece: function (row, col) {
-        if (this.board.getPiece(row, col) !== undefined)
-          return this.board.getPiece(row, col).class();
+        let pos = Game.toPos({row: row, col: col});
+        if (this.game.getPiece(pos) !== undefined)
+          return this.game.getPiece(pos).class();
         else return '';
+      },
+      hasTurn: function (pos) {
+        let piece = this.game.getPiece(pos);
+        if (piece !== undefined)
+          return piece.color === this.turn;
+        else return false;
+      },
+      promotionListener: function () {
+        this.promoteWindow = true;
+        this.promoteColor = this.turn;
+      },
+      promote: function (piece) {
+        this.game.promote(this.lastDest, piece);
+        this.promoteWindow = false;
+      },
+      switchTurn: function () {
+        this.turn = this.turn === 'white' ? 'black' : 'white';
+      },
+      selectSquare: function (row, col) {
+        let coords = {row: row, col: col};
+        let pos = Game.toPos(coords);
+        if (this.promoteWindow)
+          return false;
+        if (this.isHighlighted(row, col)) {
+          this.game.movePiece(this.selected, pos);
+          this.lastStart = this.selected;
+          this.lastDest = pos;
+          this.resetHighlight();
+          this.switchTurn();
+        } else {
+          if (this.hasTurn(pos)) {
+            this.selected = pos;
+            this.resetHighlight();
+            this.game.validMoves(pos).forEach((move) => {
+              this.highlight[move.row].splice(move.col, 1, true);
+            });
+          } else return false;
+        }
       },
       resetHighlight: function () {
         for (let i = 0; i < 8; i++) {
@@ -86,55 +118,18 @@
           }
         }
       },
-      hasTurn: function (row, col) {
-        let piece = this.board.getPiece(row, col);
-        if (piece !== undefined)
-          return piece.color === this.turn;
-        else return false;
-      },
-      switchTurn: function () {
-        this.turn = this.turn === 'white' ? 'black' : 'white';
-      },
-      selectSquare: function (row, col) {
-        if (this.promoteWindow)
-          return false;
-        if (this.isHighlighted(row, col)) {
-          this.board.movePiece({row: this.selected.row, col: this.selected.col}, {row: row, col: col});
-          this.lastStart = {row: this.selected.row, col: this.selected.col};
-          this.lastDest = {row: row, col: col};
-          this.resetHighlight();
-          this.switchTurn();
-        } else {
-          if (this.hasTurn(row, col)) {
-            this.selected = {row: row, col: col};
-            this.resetHighlight(row, col);
-            this.board.validMoves(row, col).forEach((move) => {
-              this.highlight[move.row].splice(move.col, 1, true);
-            });
-          } else return false;
-        }
-      },
       isHighlighted: function (row, col) {
         return this.highlight[row][col];
       },
       isRecentMove: function (row, col) {
-        if (this.lastDest.row === row && this.lastDest.col === col) {
-          console.log(row, col);
-          console.log(this.lastDest);
+        let pos = Game.toPos({row: row, col: col});
+        if (this.lastStart === pos)
           return true;
-        }
-        else if (this.lastStart.row === row && this.lastStart.col === col)
+        else if (this.lastDest === pos)
           return true;
         return false;
-      },
-      promotionListener: function () {
-        this.promoteWindow = true;
-        this.promoteColor = this.turn;
-      },
-      promote: function (piece) {
-        this.board.promote(this.lastDest.row, this.lastDest.col, piece);
-        this.promoteWindow = false;
       }
+      ,
     },
     computed: {
       turnReadable: function () {
@@ -171,16 +166,33 @@
     background-color: #763B10;
     margin: 0 auto;
     border-radius: 2rem;
+    position: relative;
   }
 
   .prison {
     height: 3rem;
     width: 100%;
     margin: 0 auto;
+    text-align: center;
+    line-height: 3rem;;
   }
 
   .board {
     margin: 0 auto;
+  }
+
+  .promotion {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10rem;
+    height: 6rem;
+    margin-left: -5rem;
+    margin-top: -3rem;
+    background-color: #763B10;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    color: white;
   }
 
   @media only screen and (min-width: 720px) {
