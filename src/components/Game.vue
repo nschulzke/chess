@@ -44,7 +44,6 @@
         game: new Game(),
         highlight: [],
         selected: undefined,
-        turn: 'white',
         promoteWindow: false,
         lastStart: {},
         lastDest: {},
@@ -73,22 +72,13 @@
           return this.game.getPiece(pos).class();
         else return '';
       },
-      hasTurn: function (pos) {
-        let piece = this.game.getPiece(pos);
-        if (piece !== undefined)
-          return piece.color === this.turn;
-        else return false;
-      },
       promotionListener: function () {
         this.promoteWindow = true;
-        this.promoteColor = this.turn;
+        this.promoteColor = this.game.turn;
       },
       promote: function (piece) {
         this.game.promote(this.lastDest, piece);
         this.promoteWindow = false;
-      },
-      switchTurn: function () {
-        this.turn = this.turn === 'white' ? 'black' : 'white';
       },
       selectSquare: function (row, col) {
         let coords = {row: row, col: col};
@@ -100,9 +90,8 @@
           this.lastStart = this.selected;
           this.lastDest = pos;
           this.resetHighlight();
-          this.switchTurn();
         } else {
-          if (this.hasTurn(pos)) {
+          if (this.game.hasTurn(pos)) {
             this.selected = pos;
             this.resetHighlight();
             this.game.validMoves(pos).forEach((move) => {
@@ -133,8 +122,8 @@
     },
     computed: {
       turnReadable: function () {
-        if (this.turn === 'white') return 'White';
-        if (this.turn === 'black') return 'Black';
+        if (this.game.turn === 'white') return 'White';
+        if (this.game.turn === 'black') return 'Black';
         return '';
       }
     }

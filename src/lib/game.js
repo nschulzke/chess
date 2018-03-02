@@ -1,6 +1,7 @@
 import Board from './board.js'
 
 const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+const COLORS = { white: 'white', black: 'black' };
 
 export default class Game {
   constructor() {
@@ -8,6 +9,7 @@ export default class Game {
   }
 
   restart() {
+    this.turn = COLORS.white;
     this.board = new Board();
   }
 
@@ -15,7 +17,19 @@ export default class Game {
     return this.board.getPiece(Game.toCoords(pos));
   }
 
+  hasTurn(pos) {
+    let piece = this.getPiece(pos);
+    if (piece !== undefined)
+      return piece.color === this.turn;
+    else return false;
+  }
+
+  switchTurn() {
+    this.turn = this.turn === 'white' ? 'black' : 'white';
+  }
+
   movePiece(start, dest) {
+    this.switchTurn();
     return this.board.movePiece(Game.toCoords(start), Game.toCoords(dest));
   }
 
