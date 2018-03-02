@@ -2,8 +2,9 @@
   <div class="main">
     <h1>Chess</h1>
     <p>
-      This is a simple chess game in Vue. It's not quite complete, because the project
-      was bigger than I anticipated, but you can do most moves and play a simple game.
+      This is a simple chess game in Vue. It's not quite complete, because parts of the
+      project were bigger than I anticipated, but you can do most moves and play a simple
+      game, minus a few capabilities.
 
       Things that I'm going to do later:
     </p>
