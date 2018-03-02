@@ -42,8 +42,6 @@
         selected: undefined,
         promoteWindow: false,
         promoteOptions: [],
-        lastStart: {},
-        lastDest: {}
       }
     },
     created: function () {
@@ -71,10 +69,9 @@
       promotionListener: function () {
         this.promoteWindow = true;
         this.promoteOptions = this.game.getPromoteOptions();
-        debugger;
       },
       promote: function (piece) {
-        this.game.promote(this.lastDest, piece);
+        this.game.promote(piece);
         this.promoteOptions = [];
         this.promoteWindow = false;
       },
@@ -85,8 +82,6 @@
           return false;
         if (this.isHighlighted(row, col)) {
           this.game.movePiece(this.selected, pos);
-          this.lastStart = this.selected;
-          this.lastDest = pos;
           this.resetHighlight();
         } else {
           if (this.game.hasTurn(pos)) {
@@ -110,9 +105,9 @@
       },
       isRecentMove: function (row, col) {
         let pos = Game.toPos({row: row, col: col});
-        if (this.lastStart === pos)
+        if (this.game.lastStart === pos)
           return true;
-        else if (this.lastDest === pos)
+        else if (this.game.lastDest === pos)
           return true;
         return false;
       }

@@ -12,6 +12,8 @@ export default class Game {
   restart() {
     this.turn = COLORS.white;
     this.board = new Board();
+    this.lastStart = {};
+    this.lastDest = {};
   }
 
   getPiece(pos) {
@@ -31,6 +33,8 @@ export default class Game {
 
   movePiece(start, dest) {
     this.board.movePiece(Game.toCoords(start), Game.toCoords(dest));
+    this.lastStart = start;
+    this.lastDest = dest;
     this.switchTurn();
   }
 
@@ -42,8 +46,8 @@ export default class Game {
     this.board.promotionListener = listener;
   }
 
-  promote(pos, piece) {
-    let coords = Game.toCoords(pos);
+  promote(piece) {
+    let coords = Game.toCoords(this.lastDest);
     this.board.promote(coords, piece);
   }
 
