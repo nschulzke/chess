@@ -18,10 +18,7 @@
       </div>
       <div class="promotion" v-if="promoteWindow">
         <p>Promote to what?</p>
-        <span class="piece knight" v-bind:class="promoteColor" v-on:click="promote(pieces.knight())"></span>
-        <span class="piece bishop" v-bind:class="promoteColor" v-on:click="promote(pieces.bishop())"></span>
-        <span class="piece rook" v-bind:class="promoteColor" v-on:click="promote(pieces.rook())"></span>
-        <span class="piece queen" v-bind:class="promoteColor" v-on:click="promote(pieces.queen())"></span>
+        <span class="piece" v-for="piece in promoteOptions" v-bind:class="piece.class()" v-on:click="promote(piece)"></span>
       </div>
     </div>
     <div class="controls">
@@ -35,7 +32,6 @@
   const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
   import Game from "@/lib/game.js"
-  import PIECES from "@/lib/pieces.js"
 
   export default {
     name: 'Board',
@@ -45,9 +41,9 @@
         highlight: [],
         selected: undefined,
         promoteWindow: false,
+        promoteOptions: [],
         lastStart: {},
-        lastDest: {},
-        pieces: PIECES
+        lastDest: {}
       }
     },
     created: function () {
@@ -74,10 +70,12 @@
       },
       promotionListener: function () {
         this.promoteWindow = true;
-        this.promoteColor = this.game.turn;
+        this.promoteOptions = this.game.getPromoteOptions();
+        debugger;
       },
       promote: function (piece) {
         this.game.promote(this.lastDest, piece);
+        this.promoteOptions = [];
         this.promoteWindow = false;
       },
       selectSquare: function (row, col) {

@@ -1,4 +1,5 @@
 import Board from './board.js'
+import PIECES from './pieces.js'
 
 const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const COLORS = { white: 'white', black: 'black' };
@@ -29,8 +30,8 @@ export default class Game {
   }
 
   movePiece(start, dest) {
+    this.board.movePiece(Game.toCoords(start), Game.toCoords(dest));
     this.switchTurn();
-    return this.board.movePiece(Game.toCoords(start), Game.toCoords(dest));
   }
 
   validMoves(pos) {
@@ -44,6 +45,15 @@ export default class Game {
   promote(pos, piece) {
     let coords = Game.toCoords(pos);
     this.board.promote(coords, piece);
+  }
+
+  getPromoteOptions() {
+    return [
+      PIECES.knight(),
+      PIECES.bishop(),
+      PIECES.rook(),
+      PIECES.queen()
+    ].map( (piece) => { piece.color = this.turn; return piece; } );
   }
 
   static toPos(coords) {
