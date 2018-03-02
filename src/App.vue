@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <router-view/>
+    <footer><a href="https://github.com/nschulzke/chess">Repository</a></footer>
   </div>
 </template>
 
@@ -21,5 +22,9 @@
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
     margin-top: 60px;
+  }
+  footer {
+    text-align: center;
+    padding: 1rem;
   }
 </style>
