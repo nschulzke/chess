@@ -31,8 +31,8 @@ export default class Game {
     this.turn = this.turn === 'white' ? 'black' : 'white';
   }
 
-  movePiece(start, dest) {
-    this.board.movePiece(Game.toCoords(start), Game.toCoords(dest));
+  movePiece(start, dest, special) {
+    this.board.movePiece(Game.toCoords(start), Game.toCoords(dest), special);
     this.lastStart = start;
     this.lastDest = dest;
     this.switchTurn();

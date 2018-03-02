@@ -31,7 +31,17 @@ export default class Board {
     }
   }
 
-  movePiece(start, dest) {
+  movePiece(start, dest, special) {
+    if (special === 'castle') {
+      if (!this.isValidCastle(start, dest))
+        return false;
+
+      if (dest.col === 1)
+        this.movePiece({row: start.row, col: 0}, {row: start.row, col: 2});
+      else if (dest.col === 6)
+        this.movePiece({row: start.row, col: 7}, {row: start.row, col: 5});
+    }
+
     if (this.canCapture(this.board[start.row][start.col], dest) !== false) {
       if (this.board[dest.row][dest.col] !== undefined) {
         if (this.board[dest.row][dest.col].color === 'white')
@@ -74,12 +84,13 @@ export default class Board {
   validMoves(coords) {
     let row = coords.row;
     let col = coords.col;
-    let movePush = (array, moveRow, moveCol) => {
+    let movePush = (array, moveRow, moveCol, special) => {
       let row = coords.row;
       let col = coords.col;
       return array.push({
         row: row + moveRow,
-        col: col + moveCol
+        col: col + moveCol,
+        special: special
       });
     };
 
@@ -168,6 +179,13 @@ export default class Board {
         movePush(all, -move.range[1], move.range[0]);
         movePush(all, -move.range[1], -move.range[0]);
         movePush(all, move.range[1], -move.range[0]);
+      } else if (move.type === 'castle' && piece.hasMoved === false) {
+        let left = {row: coords.row, col: 1, special: 'castle'};
+        let right = {row: coords.row, col: 6, special: 'castle'};
+        if (this.isValidCastle(coords, left))
+          all.push(left);
+        if (this.isValidCastle(coords, right))
+          all.push(right);
       }
       all = all.filter((m) => {
         if (m.row < 0 || m.col < 0)
@@ -187,5 +205,37 @@ export default class Board {
 
     console.log(ret);
     return ret;
+  }
+
+  isValidCastle(start, dest) {
+    if (start.row !== dest.row)
+      return false;
+
+    let rookCol;
+    if (dest.col === 1)
+      rookCol = 0;
+    else if (dest.col === 6)
+      rookCol = 7;
+    else return false;
+    let rookCoords = {row: dest.row, col: rookCol};
+
+    let king = this.getPiece(start);
+    let rook = this.getPiece(rookCoords);
+    if (king === undefined || rook === undefined)
+      return false;
+    if (rook.name !== 'rook' || king.name !== 'king')
+      return false;
+    if (king.hasMoved || rook.hasMoved)
+      return false;
+
+    let clear = true;
+    if (dest.col === 1) {
+      for (let c = dest.col; c < start.col; c++)
+        if (this.getPiece({row: start.row, col: c})) clear = false;
+    } else if (dest.col === 6) {
+      for (let c = dest.col; c > start.col; c--)
+        if (this.getPiece({row: start.row, col: c})) clear = false;
+    }
+    return clear;
   }
 }

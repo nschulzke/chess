@@ -3,16 +3,16 @@
     <h1>Chess</h1>
     <p>
       This is a simple chess game in Vue. It's not quite complete, because parts of the
-      project were bigger than I anticipated, but you can do most moves and play a simple
-      game, minus a few capabilities.
+      project were bigger than I anticipated, but you can do most moves and play a game
+      with a friend.
 
-      Things that I'm going to do later:
+      Things that I'm going to add later:
     </p>
     <ul>
-      <li>Check and checkmate detection</li>
-      <li>Castling</li>
       <li>Timers</li>
-      <li>en Passant capturing</li>
+      <li>Check and checkmate detection</li>
+      <li>Game history</li>
+      <li>en Passant capturing (requires game history)</li>
     </ul>
     <a href="#/game">Go to the game!</a>
   </div>

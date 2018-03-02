@@ -38,7 +38,7 @@
     data() {
       return {
         game: new Game(),
-        highlight: [],
+        validMoves: [],
         selected: undefined,
         promoteWindow: false,
         promoteOptions: [],
@@ -46,9 +46,9 @@
     },
     created: function () {
       for (let i = 0; i < 8; i++) {
-        this.highlight.push([]);
+        this.validMoves.push([]);
         for (let j = 0; j < 8; j++) {
-          this.highlight[i].push(false);
+          this.validMoves[i].push(false);
         }
         this.game.setPromotionListener(this.promotionListener);
       }
@@ -81,14 +81,14 @@
         if (this.promoteWindow)
           return false;
         if (this.isHighlighted(row, col)) {
-          this.game.movePiece(this.selected, pos);
+          this.game.movePiece(this.selected, pos, this.validMoves[row][col].special);
           this.resetHighlight();
         } else {
           if (this.game.hasTurn(pos)) {
             this.selected = pos;
             this.resetHighlight();
             this.game.validMoves(pos).forEach((move) => {
-              this.highlight[move.row].splice(move.col, 1, true);
+              this.validMoves[move.row].splice(move.col, 1, move);
             });
           } else return false;
         }
@@ -96,12 +96,12 @@
       resetHighlight: function () {
         for (let i = 0; i < 8; i++) {
           for (let j = 0; j < 8; j++) {
-            this.highlight[i].splice(j, 1, false);
+            this.validMoves[i].splice(j, 1, false);
           }
         }
       },
       isHighlighted: function (row, col) {
-        return this.highlight[row][col];
+        return this.validMoves[row][col] !== false;
       },
       isRecentMove: function (row, col) {
         let pos = Game.toPos({row: row, col: col});
